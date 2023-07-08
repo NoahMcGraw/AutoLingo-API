@@ -1,4 +1,6 @@
-import { SourceWord, TranslatedResultObj, TranslatedWord } from '../../models/MSApi.model'
+import SourceWord from '../../models/SourceWord.model'
+import TranslatedResultObj from '../../models/TranslatedResult.model'
+import TranslatedWord from '../../models/TranslatedWord.model'
 import { getTranslations } from '../microsoft-translator/microsoft-translator'
 import { getSourceWords } from '../openai/openai'
 

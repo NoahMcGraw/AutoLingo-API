@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { formatUrlGetParams } from '../../utils'
-import { SourceWord } from '../../models/MSApi.model'
 import { DMAPIResponse, DMAPIResponseSingular } from '../../models/DMApi.model'
+import SourceWord from '../../models/SourceWord.model'
 
 /** /========================================\
  *  |=======Source Word Get Endpoints========|
@@ -12,56 +12,56 @@ import { DMAPIResponse, DMAPIResponseSingular } from '../../models/DMApi.model'
  */
 
 /**
- * Fetches a list of words of determined length and topic
+ * DEPRECATED: Fetches a list of words of determined length and topic
  * @param wordNumber: Number - Number of words to return from the request
  * @param lang: String - Alternate language to return. Known Options: es | en
  * @returns List of random words
  */
 export const getSourceWords = (wordNumber: number, lang: string = 'en', topic: string = 'travel') =>
   new Promise<SourceWord[]>((resolve, reject) => {
+    reject('This endpoint has been deprecated. Please use the openai/getSourceWords endpoint instead.')
     // The random word api defaults to returning english and does not accept an 'en' lang code so we will just blank the value.
-    if (lang == 'en') {
-      lang = ''
-    }
-
-    const _params = [
-      {
-        key: 'max',
-        value: wordNumber.toString(),
-      },
-      {
-        key: 'v',
-        value: lang,
-      },
-      {
-        key: 'topics',
-        value: topic,
-      },
-      {
-        key: 'rel_trg',
-        value: topic,
-      },
-      // {
-      //   key: "rel_gen",
-      //   value: topic
-      // }
-      // {
-      //   key: "rel_spc",
-      //   value: topic
-      // }
-    ]
-    axios({
-      method: 'GET',
-      url: `${import.meta.env.VITE_DATAMUSE_API_URL}/words${formatUrlGetParams(_params)}`,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-      .then((x: any) => x.data)
-      .then((sourceWordArr: DMAPIResponse) => {
-        const _sourceWordArr = pullWordsFromDMResponse(sourceWordArr)
-        resolve(_sourceWordArr)
-      })
+    // if (lang == 'en') {
+    //   lang = ''
+    // }
+    // const _params = [
+    //   {
+    //     key: 'max',
+    //     value: wordNumber.toString(),
+    //   },
+    //   {
+    //     key: 'v',
+    //     value: lang,
+    //   },
+    //   {
+    //     key: 'topics',
+    //     value: topic,
+    //   },
+    //   {
+    //     key: 'rel_trg',
+    //     value: topic,
+    //   },
+    //   // {
+    //   //   key: "rel_gen",
+    //   //   value: topic
+    //   // }
+    //   // {
+    //   //   key: "rel_spc",
+    //   //   value: topic
+    //   // }
+    // ]
+    // axios({
+    //   method: 'GET',
+    //   url: `${process.env.VITE_DATAMUSE_API_URL}/words${formatUrlGetParams(_params)}`,
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //   },
+    // })
+    //   .then((x: any) => x.data)
+    //   .then((sourceWordArr: DMAPIResponse) => {
+    //     const _sourceWordArr = pullWordsFromDMResponse(sourceWordArr)
+    //     resolve(_sourceWordArr)
+    //   })
   })
 
 /**
@@ -94,7 +94,7 @@ export const getSearchSuggestions = (searchString: string, maxResults: number, l
     ]
     axios({
       method: 'GET',
-      url: `${import.meta.env.VITE_DATAMUSE_API_URL}/sug${formatUrlGetParams(_params)}`,
+      url: `${process.env.VITE_DATAMUSE_API_URL}/sug${formatUrlGetParams(_params)}`,
       headers: {
         'Content-Type': 'application/json',
       },

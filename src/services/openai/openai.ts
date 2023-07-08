@@ -1,6 +1,6 @@
-import { isWithinTokenLimit } from 'gpt-tokenizer/src/model/text-davinci-003'
+// import { isWithinTokenLimit } from 'gpt-tokenizer/src/model/text-davinci-003'
 import { Configuration, OpenAIApi } from 'openai'
-import { SourceWord } from '../../models/MSApi.model'
+import SourceWord from '../../models/SourceWord.model'
 
 type getCompletionsProps = {
   prompt: string
@@ -60,7 +60,7 @@ export const getCompletionsDavinci003 = async ({
   // OpenAI API configuration
   const openai = new OpenAIApi(
     new Configuration({
-      apiKey: import.meta.env.VITE_OPENAI_API_KEY,
+      apiKey: process.env.VITE_OPENAI_API_KEY,
     })
   )
 
@@ -71,41 +71,40 @@ export const getCompletionsDavinci003 = async ({
 
   try {
     //check if prompt exceeds out max soft token limit
-    if (!isWithinTokenLimit(prompt, openaiHardTokenLimit)) {
-      throw new Error('Error creating prompt: Prompt exceeds max soft token limit')
-    }
+    // if (!isWithinTokenLimit(prompt, openaiHardTokenLimit)) {
+    //   throw new Error('Error creating prompt: Prompt exceeds max soft token limit')
+    // }
 
     const responseObj = await openai.createCompletion({
       model: 'text-davinci-003',
       prompt,
-      max_tokens,
-      temperature,
-      top_p,
-      n,
-      stream,
-      stop,
-      presence_penalty,
-      frequency_penalty,
-      best_of,
-      logit_bias,
-      user,
+      // max_tokens,
+      // temperature,
+      // top_p,
+      // n,
+      // stream,
+      // stop,
+      // presence_penalty,
+      // frequency_penalty,
+      // best_of,
+      // logit_bias,
+      // user,
     })
-    console.log('Response:', responseObj)
     const completionsStr = responseObj.data.choices[0]?.text
-    //console.log('Completions:', completionsStr)
+    console.log('Completions:', completionsStr)
     // Parse the completions string into an array and trim out any non-standard characters
     try {
       if (typeof completionsStr !== 'undefined') {
         response = parseCompletions(completionsStr)
       }
-    } catch (error) {
-      console.error('Error parsing completions:', error)
+    } catch (_error) {
+      const error = _error as Error
+      console.error('Error parsing completions:', error.message)
     }
 
     // console.log('Response:', response)
   } catch (_error) {
     const error = _error as Error
-    console.log(error)
     throw new Error(error.message)
   }
 
