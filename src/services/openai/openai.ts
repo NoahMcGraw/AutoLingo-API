@@ -101,8 +101,6 @@ export const getCompletionsDavinci003 = async ({
       const error = _error as Error
       console.error('Error parsing completions:', error.message)
     }
-
-    // console.log('Response:', response)
   } catch (_error) {
     const error = _error as Error
     throw new Error(error.message)
