@@ -23,3 +23,6 @@ The variables you'll need:
 `VITE_MS_TRANSLATOR_API_LOCALITY`
 `VITE_OPENAI_API_KEY`
 `VITE_ALLOWED_ORIGINS`
+(If you are enabling https traffic)
+`VITE_PATH_TO_SSL_CERT`
+`VITE_PATH_TO_SSL_KEY`

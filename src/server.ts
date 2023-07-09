@@ -1,12 +1,12 @@
 import express from 'express'
 import cors from 'cors'
-// import https from 'https'
-// import fs from 'fs'
+import https from 'https'
+import http from 'http'
+import fs from 'fs'
 import dotenv from 'dotenv'
 import { buildTranslationsList } from './services/integration-bridge/bridge'
 import { getSearchSuggestions } from './services/datamuse/datamuse'
 import originChecker from './middleware/originChecker'
-// import { Server } from 'http'
 
 // Load environment variables from .env file
 dotenv.config()
@@ -20,19 +20,32 @@ app.use(cors())
 // Enable origin checker middleware
 app.use(originChecker)
 
-// TODO: Uncomment this code to enable HTTPS once code is deployed to production
-// const server = https.createServer(
-//   {
-//     // Grab paths to SSL cert and private key from environment variables
-//     cert: fs.readFileSync(`${process.env.PATH_TO_SSL_CERT}`),
-//     key: fs.readFileSync(`${process.env.PATH_TO_SSL_KEY}`),
-//   },
-//   app
-// )
+const httpsPort = process.env.VITE_HTTPS_PORT || 443
+const httpPort = process.env.VITE_HTTP_PORT || 80
 
-// server.listen(3003, () => {
-//   console.log('Server is listening on port 3003.')
-// })
+// Create HTTPS server
+https
+  .createServer(
+    {
+      // Grab paths to SSL cert and private key from environment variables
+      cert: fs.readFileSync(`${process.env.VITE_PATH_TO_SSL_CERT}`),
+      key: fs.readFileSync(`${process.env.VITE_PATH_TO_SSL_KEY}`),
+    },
+    app
+  )
+  .listen(httpsPort, () => {
+    console.log(`Https Server is listening on port ${httpsPort}.`)
+  })
+
+// Create HTTP server to redirect all HTTP requests to HTTPS
+http
+  .createServer((req, res) => {
+    res.writeHead(301, { Location: 'https://' + req.headers['host'] + req.url })
+    res.end()
+  })
+  .listen(httpPort, () => {
+    console.log(`Http Server is listening on port ${httpPort}.`)
+  })
 
 // Provide a basic endpoint for testing
 app.get('/', (_req, res) => {
@@ -92,8 +105,4 @@ app.get('/searchSuggestions', async (req, res) => {
 
   // Return the list of search suggestions
   res.send(searchSuggestions)
-})
-
-app.listen(3003, () => {
-  console.log('Server is listening on port 3003.')
 })
