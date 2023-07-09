@@ -1,6 +1,9 @@
 // import { isWithinTokenLimit } from 'gpt-tokenizer/src/model/text-davinci-003'
 import { Configuration, OpenAIApi } from 'openai'
 import SourceWord from '../../models/SourceWord.model'
+import { removeTrailingCommas, removeTruncatingSymbols, trimByCurlyBrackets } from '../../utils'
+import { OpenAiAPICompletionsResponse } from '../../models/OpenAiAPI.model'
+import { error } from 'console'
 
 type getChatCompletionsGPT35TurboProps = {
   systemPrompt: string
@@ -10,6 +13,7 @@ type getChatCompletionsGPT35TurboProps = {
   top_p?: number
   presence_penalty?: number
   frequency_penalty?: number
+  stop?: string[] | undefined
 }
 
 type getCompletionsProps = {
@@ -37,86 +41,21 @@ export const getSourceWords = ({ wordNumber, topic, lang = 'en' }: getSourceWord
   new Promise<SourceWord[]>((resolve, reject) => {
     getChatCompletionsGPT35Turbo({
       systemPrompt:
-        "You are a function and your purpose is to take a topic, a languageCode, and a number of return values and return an array of the requested length containing related nouns, verbs, or adjectives to the topic in the language specified.\n\nYou can receive one JSON object as a argument containing 3 properties: \ntopic: string - The word to generate related words around, languageCode: string -\n The shortcode for the topic and related words' source language. \nn: number: The number of related words to generate.\n\nGiven the topic and language code, your function is to return a JSON object containing 1 property: \ndata: string[] - The array of related nouns, verbs, or adjectives\n\nIf one or more of the properties in the argument object were not passed, you should return a JSON object containing 2 properties:\nstatus: number - Http status code of bad params (400)\nerror: string - Message containing the reason for error.",
+        "You are an AI model and I am simulating a function with you called `getRelatedWordsArr`. This function receives three required arguments: a topic, a language code, and an integer 'n'. The function generates an array of 'n' related words to the topic. Generate a suitable response, which would be an object with status and data fields, where data should be an array of 'n' related words to the topic. Data should never have a length shorter than 'n'.\nYour Source Code, written in TypeScript sudo code:\n```\ntype getRelatedWordsProps = {\n  topic: string\n  languageCode: string\n  n: number\n}\nconst getRelatedWordsArr = ({ topic, languageCode, n }: getRelatedWordsProps) => {\n  let res = {\n    status: 200 as number,\n    data: [] as string[],\n  }\n  for (let i = 0; i < n; i++) {\n    res.data.push(getWordRelatedToTopic(topic, languageCode))\n  }\n  return res\n}\n```",
       userPrompt: `{\n"topic": ${topic},\n"languageCode": ${lang},\n"n": ${wordNumber}\n}`,
-      frequency_penalty: 2,
-      presence_penalty: 2,
+      temperature: 0,
+      frequency_penalty: 1,
+      presence_penalty: 1,
       max_tokens: 3000,
+      // stop: ['...'],
     })
       .then((sourceWordArr: string[]) => {
-        // console.log('Source Words:', sourceWordArr)
         resolve(sourceWordArr)
       })
       .catch((error) => {
         reject(error)
       })
   })
-
-export const getCompletionsDavinci003 = async ({
-  prompt,
-  max_tokens = 60,
-  temperature = 1,
-  top_p = 1,
-  n = 20,
-  stream = false,
-  stop = undefined,
-  presence_penalty = 1,
-  frequency_penalty = 1,
-  best_of = 1,
-  logit_bias = undefined,
-  user = undefined,
-}: getCompletionsProps): Promise<string[]> => {
-  // OpenAI API configuration
-  const openai = new OpenAIApi(
-    new Configuration({
-      apiKey: process.env.VITE_OPENAI_API_KEY,
-    })
-  )
-
-  // Hard token limit for OpenAI API under text-davinci-003 model
-  const openaiHardTokenLimit = 4000
-
-  let response = [] as string[]
-
-  try {
-    //check if prompt exceeds out max soft token limit
-    // if (!isWithinTokenLimit(prompt, openaiHardTokenLimit)) {
-    //   throw new Error('Error creating prompt: Prompt exceeds max soft token limit')
-    // }
-
-    const responseObj = await openai.createCompletion({
-      model: 'text-davinci-003',
-      prompt,
-      // max_tokens,
-      // temperature,
-      // top_p,
-      // n,
-      // stream,
-      // stop,
-      // presence_penalty,
-      // frequency_penalty,
-      // best_of,
-      // logit_bias,
-      // user,
-    })
-    const completionsStr = responseObj.data.choices[0]?.text
-    console.log('Completions:', completionsStr)
-    // Parse the completions string into an array and trim out any non-standard characters
-    try {
-      if (typeof completionsStr !== 'undefined') {
-        response = parseCompletions(completionsStr)
-      }
-    } catch (_error) {
-      const error = _error as Error
-      console.error('Error parsing completions:', error.message)
-    }
-  } catch (_error) {
-    const error = _error as Error
-    throw new Error(error.message)
-  }
-
-  return response
-}
 
 export const getChatCompletionsGPT35Turbo = async ({
   systemPrompt,
@@ -126,6 +65,7 @@ export const getChatCompletionsGPT35Turbo = async ({
   top_p = 1,
   presence_penalty = 1,
   frequency_penalty = 1,
+  stop = undefined,
 }: getChatCompletionsGPT35TurboProps): Promise<string[]> => {
   // OpenAI API configuration
   const openai = new OpenAIApi(
@@ -146,7 +86,7 @@ export const getChatCompletionsGPT35Turbo = async ({
     // }
 
     const responseObj = await openai.createChatCompletion({
-      model: 'gpt-3.5-turbo',
+      model: 'gpt-3.5-turbo-0613',
       messages: [
         {
           role: 'system',
@@ -162,20 +102,19 @@ export const getChatCompletionsGPT35Turbo = async ({
       top_p,
       frequency_penalty,
       presence_penalty,
+      stop,
     })
-    console.log('Response:', responseObj.data.choices[0].message)
 
-    // const completionsStr = responseObj.data.choices[0]?.text
-    // console.log('Completions:', completionsStr)
+    const completionsStr = responseObj.data.choices[0]?.message?.content
     // Parse the completions string into an array and trim out any non-standard characters
-    // try {
-    //   if (typeof completionsStr !== 'undefined') {
-    //     response = parseCompletions(completionsStr)
-    //   }
-    // } catch (_error) {
-    //   const error = _error as Error
-    //   console.error('Error parsing completions:', error.message)
-    // }
+    try {
+      if (typeof completionsStr !== 'undefined') {
+        response = parseCompletionsRes(completionsStr)
+      }
+    } catch (_error) {
+      const error = _error as Error
+      console.error('Error parsing completions:', error.message)
+    }
   } catch (_error) {
     const error = _error as Error
     throw new Error(error.message)
@@ -185,12 +124,20 @@ export const getChatCompletionsGPT35Turbo = async ({
 }
 
 // Main function to parse completions
-const parseCompletions = (completionsStr: string) => {
+const parseCompletionsRes = (completionsStr: string) => {
   let trimmedCompletionsString
   let response = [] as string[]
   try {
-    trimmedCompletionsString = trimCompletionsString(completionsStr)
-    response = splitCompletionString(trimmedCompletionsString)
+    trimmedCompletionsString = trimCompletionsResString(completionsStr)
+    const completionsObj = splitCompletionResStringtoJSON(trimmedCompletionsString) as OpenAiAPICompletionsResponse
+    if (completionsObj.status && completionsObj.status !== 200) {
+      throw new Error('Error in response: ' + completionsObj.error)
+    }
+    if (!completionsObj.data) {
+      throw new Error('No Data field returned')
+    }
+    // If the response has a data field, then we have a valid response.
+    response = completionsObj.data
   } catch (_error) {
     const error = _error as Error
     throw new Error(error.message)
@@ -199,7 +146,7 @@ const parseCompletions = (completionsStr: string) => {
 }
 
 // Helper function to trim the completions string
-const trimCompletionsString = (completionsStr: string): string => {
+const trimCompletionsResString = (completionsStr: string): string => {
   let completions
 
   // If completionsStr is empty, then throw an error
@@ -207,61 +154,38 @@ const trimCompletionsString = (completionsStr: string): string => {
     throw new Error('Error trimming completions string: Completions string is empty')
   }
 
-  // TODO: IMPLEMENT THIS
-  return completionsStr
+  // Attempt to trim by curly brackets
+  const trimByCurlyBracketsRes = trimByCurlyBrackets(completionsStr)
+  // If trimByCurlyBrackets is not empty, then use it
+  if (trimByCurlyBracketsRes !== '') {
+    completions = trimByCurlyBracketsRes
+  } else {
+    throw new Error('Error trimming completions string: No valid trim method found: ' + completionsStr)
+  }
 
-  // // If completionsStr is not empty, then try trimByBrackets
-  // const trimByBracketsRes = trimByBrackets(completionsStr)
-  // // If trimByBrackets is not empty, then use it
-  // if (trimByBracketsRes !== '') {
-  //   completions = trimByBracketsRes
-  //   return completions
-  // }
-  // // If trimByBrackets is empty, then try trimByDoubleQuotes
-  // const trimByDoubleQuotesRes = trimByDoubleQuotes(completionsStr)
-  // // If trimByDoubleQuotes is not empty, then use it
-  // if (trimByDoubleQuotesRes !== '') {
-  //   completions = trimByDoubleQuotesRes
-  //   return completions
-  // }
-  // // If trimByDoubleQuotes is empty, then try trimBySingleQuotes
-  // const trimBySingleQuotesRes = trimBySingleQuotes(completionsStr)
-  // // If trimBySingleQuotes is not empty, then use it
-  // if (trimBySingleQuotesRes !== '') {
-  //   completions = trimBySingleQuotesRes
-  //   return completions
-  // }
-  // // If trimBySingleQuotes is empty, then try trimByNumberedList
-  // const trimByNumberedListRes = trimByNumberedList(completionsStr)
-  // // If trimByNumberedList is not empty, then use it
-  // if (trimByNumberedListRes !== '') {
-  //   completions = trimByNumberedListRes
-  //   return completions
-  // } else {
-  //   throw new Error('Error trimming completions string: No valid trim method found: ' + completionsStr)
-  // }
+  // If completions has been set, attempt to remove trailing commas
+  if (completions) {
+    completions = removeTruncatingSymbols(completions)
+    completions = removeTrailingCommas(completions)
+  }
+
+  return completions
 }
 
-const splitCompletionString = (completionsStr: string): string[] => {
-  // TODO: IMPLEMENT THIS
-  return completionsStr.split('\n')
+const splitCompletionResStringtoJSON = (completionsStr: string): OpenAiAPICompletionsResponse => {
+  let response: OpenAiAPICompletionsResponse
+  // If the api understood the prompt, then it will return a JSON string. We need to parse it.
+  try {
+    const completionsObj = JSON.parse(completionsStr)
+    // If the response has a status field and it is not 200, then we have an error.
+    if (!completionsObj) {
+      throw new Error('Response is not a valid JSON string.: ' + completionsStr)
+    }
+    response = completionsObj
+  } catch (_error) {
+    const error = _error as Error
+    throw new Error(error.message)
+  }
 
-  // let response = splitByDoubleQuotesAndCommas(completionsStr)
-  // if (response.length === 3) {
-  //   return response
-  // }
-  // response = splitBySingleQuotesAndCommas(completionsStr)
-  // if (response.length === 3) {
-  //   return response
-  // }
-  // response = splitByNewlines(completionsStr)
-  // if (response.length === 3) {
-  //   return response
-  // }
-  // response = splitByNumberedList(completionsStr)
-  // if (response.length === 3) {
-  //   return response
-  // } else {
-  //   throw new Error('Error parsing completions string: No valid formats found. Completions: ' + completionsStr)
-  // }
+  return response
 }
