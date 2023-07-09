@@ -31,7 +31,7 @@ The variables you'll need:
 
 I am currently hosting this API using the GCloud App Engine. You can set up your own project by following along [here](https://cloud.google.com/appengine/docs/standard/nodejs/building-app)
 
-Once you've deployed, make sure you add the correct values to your app.yaml file. Mine are as follows:
+Once you've deployed, make sure you add your app.yaml file to the base of the api and include some or all of the following values:
 
 `runtime: nodejs20` (or similar)
 `entrypoint: npm run serve`

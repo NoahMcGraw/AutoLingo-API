@@ -1,9 +1,0 @@
-runtime: nodejs20
-entrypoint: npm run serve
-env_variables:
-  VITE_DATAMUSE_API_URL: https://api.datamuse.com
-  VITE_MS_TRANSLATOR_API_URL: https://api.cognitive.microsofttranslator.com
-  VITE_MS_TRANSLATOR_API_KEY: e3fe55d31ab945b89095db07e8158b89
-  VITE_MS_TRANSLATOR_API_LOCALITY: centralus
-  VITE_OPENAI_API_KEY: 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
-  VITE_ALLOWED_ORIGINS: https://localhost:3000,https://grand-cajeta-92ed93.netlify.app
