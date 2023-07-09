@@ -5,6 +5,7 @@ import cors from 'cors'
 import dotenv from 'dotenv'
 import { buildTranslationsList } from './services/integration-bridge/bridge'
 import { getSearchSuggestions } from './services/datamuse/datamuse'
+import originChecker from './middleware/originChecker'
 // import { Server } from 'http'
 
 // Load environment variables from .env file
@@ -15,6 +16,9 @@ const app = express()
 
 // Enable CORS
 app.use(cors())
+
+// Enable origin checker middleware
+app.use(originChecker)
 
 // TODO: Uncomment this code to enable HTTPS once code is deployed to production
 // const server = https.createServer(
