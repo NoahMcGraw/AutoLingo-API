@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "compile": "npx tsc",
-    "serve": "npm run compile && dist/server.js",
+    "serve": "node dist/server.js",
+    "compile:serve": "npm run compile && dist/server.js",
     "deploy": "npm run compile && gcloud app deploy"
   },
   "author": "Noah McGraw",
