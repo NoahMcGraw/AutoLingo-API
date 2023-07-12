@@ -20,5 +20,6 @@ module.exports = {
   },
   collectCoverageFrom: ['src/**/*.{js,jsx,ts,tsx}'],
   coverageDirectory: 'coverage',
+  testPathIgnorePatterns: ['/node_modules/', '/dist/'],
   // moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths, { prefix: '<rootDir>/' }),
 }
