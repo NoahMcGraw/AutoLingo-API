@@ -4,9 +4,9 @@ import cors from 'cors'
 // import http from 'http'
 // import fs from 'fs'
 import dotenv from 'dotenv'
-import { buildTranslationsList } from './services/integration-bridge/bridge'
 import { getSearchSuggestions } from './services/datamuse/datamuse'
 import originChecker from './middleware/originChecker'
+import deckRoutes from './endpoints/deck/deck.endpoint'
 
 // Load environment variables from .env file
 dotenv.config()
@@ -56,37 +56,23 @@ app.get('/', (_req, res) => {
   res.send('Hello Mother!')
 })
 
+// Use Deck Routes
+app.use('/deck', deckRoutes)
+
 // Get Route for related translations
 app.get('/relatedTranslations', async (req, res) => {
-  // Get the query params from the request
-  const { wordNumber, sourceLang, targetLang, topic } = req.query
-
-  // Check that the required params are present and transform them into the correct types
-  if (!wordNumber || !sourceLang || !targetLang || !topic) {
-    res.status(400).send('Missing required query params')
-    return
-  }
-
-  if (
-    typeof wordNumber !== 'string' ||
-    typeof sourceLang !== 'string' ||
-    typeof targetLang !== 'string' ||
-    typeof topic !== 'string'
-  ) {
-    res.status(400).send('Invalid query params')
-    return
-  }
-
-  const formattedWordNumber = parseInt(wordNumber)
-
-  // Use the buildTranslationsList function to get the list of translations
-  const translations = await buildTranslationsList(formattedWordNumber, sourceLang, targetLang, topic)
-
   // Return the list of translations
-  res.send(translations)
+  res.send("Deprecated. Use '/deck/create' instead.")
 })
 
-// Get route for search suggestions
+/**
+ * Deck Endpoints
+ */
+
+/**
+ * @route GET /searchSuggestions
+ *
+ */
 app.get('/searchSuggestions', async (req, res) => {
   // Get the query params from the request
   const { searchString, maxResults, lang } = req.query
