@@ -110,3 +110,5 @@ app.get('/searchSuggestions', async (req, res) => {
   // Return the list of search suggestions
   res.send(searchSuggestions)
 })
+
+export default app
