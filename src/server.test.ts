@@ -1,7 +1,5 @@
 // Placeholder test for server.ts to confirm that the test suite is working. Uses jest
 
-import _server from './server'
-
 describe('server', () => {
   let server: typeof jest
 
