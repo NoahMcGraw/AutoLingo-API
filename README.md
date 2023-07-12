@@ -26,3 +26,21 @@ The variables you'll need:
 (If you are enabling https traffic)
 `VITE_PATH_TO_SSL_CERT`
 `VITE_PATH_TO_SSL_KEY`
+
+# Deployment
+
+I am currently hosting this API using the GCloud App Engine. You can set up your own project by following along [here](https://cloud.google.com/appengine/docs/standard/nodejs/building-app)
+
+Once you've deployed, make sure you add your app.yaml file to the base of the api and include some or all of the following values:
+
+`runtime: nodejs20` (or similar)
+`entrypoint: npm run serve`
+`env_variables:`
+`  VITE_DATAMUSE_API_URL`
+`  VITE_MS_TRANSLATOR_API_URL`
+`  VITE_MS_TRANSLATOR_API_KEY`
+`  VITE_MS_TRANSLATOR_API_LOCALITY`
+`  VITE_OPENAI_API_KEY`
+`  VITE_ALLOWED_ORIGINS`
+
+Then, you can run `gcloud app deploy` to deploy
