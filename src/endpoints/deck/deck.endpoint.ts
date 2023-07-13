@@ -134,7 +134,7 @@ router.post('/create', async function (req, res) {
   }
 })
 
-router.patch('edit', async function (req, res) {
+router.patch('/edit', async function (req, res) {
   try {
     const id = req.body.id
     const payload = req.body.payload
