@@ -2,6 +2,8 @@ import { v4 as uuidv4 } from 'uuid'
 import { getSourceWords } from '../openai/openai'
 import { getTranslations } from '../microsoft-translator/microsoft-translator'
 import { mergeTranslationsIntoCardList } from '../integration-bridge/bridge'
+import Deck from '../../models/Deck.model'
+import Card from '../../models/Card.model'
 
 /**
  * @param id ID of the deck to retrieve

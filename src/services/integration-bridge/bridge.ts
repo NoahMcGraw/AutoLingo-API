@@ -1,3 +1,4 @@
+import Card from '../../models/Card.model'
 import TranslatedWord from '../../models/TranslatedWord.model'
 
 /**

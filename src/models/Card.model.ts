@@ -4,3 +4,5 @@ type Card = {
   sourceWord: string
   targetWord: string
 }
+
+export default Card

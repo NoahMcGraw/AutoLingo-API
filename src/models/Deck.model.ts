@@ -1,3 +1,5 @@
+import Card from './Card.model'
+
 type Deck = {
   id: string
   name: string
@@ -6,3 +8,5 @@ type Deck = {
   targetLang: string
   cards: Card[]
 }
+
+export default Deck

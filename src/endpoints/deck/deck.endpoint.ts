@@ -1,5 +1,8 @@
 import express from 'express'
 import * as deckService from '../../services/deck/deck.service'
+import PropTypeMap from '../../models/PropTypeMap.model'
+import Deck from '../../models/Deck.model'
+import { hasPropertiesWithCorrectTypes } from '../../services/validator/validator.service'
 const router = express.Router()
 
 router.get('/all', function (req, res) {
