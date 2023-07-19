@@ -42,21 +42,22 @@ export const addTopicsToDeck = async (deck: Deck, topics: string[]): Promise<Dec
   /**
    * First, call the source word api for each topic to retrieve our starting word set.
    */
-  topics.map(async (topic) => {
-    getSourceWords({ wordNumber: maxCardsPerTopic, topic: topic, lang: deck.sourceLang })
-      .then((sources) => {
-        sources.map((source) => {
-          cardsToAdd.push({
-            id: uuidv4(),
-            topic: topic,
-            sourceWord: source,
-          } as Card)
-        })
-      })
-      .catch((err) => {
-        console.error(err)
-      })
-  })
+  for (const topic of topics) {
+    try {
+      // We can now await the promise returned by getSourceWords
+      const sources = await getSourceWords({ wordNumber: maxCardsPerTopic, topic: topic, lang: deck.sourceLang })
+
+      for (const source of sources) {
+        cardsToAdd.push({
+          id: uuidv4(),
+          topic: topic,
+          sourceWord: source,
+        } as Card)
+      }
+    } catch (err) {
+      console.error(err)
+    }
+  }
 
   // Create sourcelist by flattening the cardsToAdd sourceWord property into a single array
   const sourceList = cardsToAdd.map((card) => card.sourceWord)
@@ -152,7 +153,7 @@ export const createDeck = async (
   topics: string[]
 ): Promise<Deck> => {
   // First, lets define our deck object
-  const newDeck = {
+  const newDeckBase = {
     id: uuidv4(),
     name: name,
     topics: topics,
@@ -162,9 +163,11 @@ export const createDeck = async (
   } as Deck
 
   // Next, lets add the topics to the deck
-  await addTopicsToDeck(newDeck, topics)
+  const newDeckWithCards = await addTopicsToDeck(newDeckBase, topics)
 
-  return await addDeck(newDeck)
+  const newDeck = await addDeck(newDeckWithCards)
+
+  return newDeck
 }
 
 /**

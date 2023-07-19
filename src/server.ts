@@ -17,6 +17,9 @@ const app = express()
 // Enable CORS
 app.use(cors())
 
+// Make sure to put this before your routes
+app.use(express.json())
+
 // Enable origin checker middleware
 app.use(originChecker)
 
