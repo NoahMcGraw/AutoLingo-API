@@ -7,6 +7,7 @@ import dotenv from 'dotenv'
 import { getSearchSuggestions } from './services/datamuse/datamuse'
 import originChecker from './middleware/originChecker'
 import deckRoutes from './endpoints/deck/deck.endpoint'
+import { getTranslations } from './services/microsoft-translator/microsoft-translator'
 
 // Load environment variables from .env file
 dotenv.config()
@@ -59,6 +60,9 @@ app.get('/', (_req, res) => {
   res.send('Hello Mother!')
 })
 
+/**
+ * Deck Endpoints
+ */
 // Use Deck Routes
 app.use('/deck', deckRoutes)
 
@@ -69,8 +73,43 @@ app.get('/relatedTranslations', async (req, res) => {
 })
 
 /**
- * Deck Endpoints
+ * @route GET /getTranslation
+ * @param {string} word.query.required - The word to get the translation for
+ * @param {string} sourceLang.query.required - The language to translate to
+ * @param {string} targetLang.query.required - The language to translate from
+ * @returns {object} 200 - An object containing the translation
+ * @returns {Error}  missing required query params
  */
+app.get('/getTranslation', async (req, res) => {
+  try {
+    // Get the query params from the request
+    const { word, sourceLang, targetLang } = req.query
+
+    // Check that the required params are present and transform them into the correct types
+    if (!word || !sourceLang || !targetLang) {
+      throw new Error('Missing required query params')
+    }
+
+    if (typeof word !== 'string' || typeof sourceLang !== 'string' || typeof targetLang !== 'string') {
+      throw new Error('Invalid query params')
+    }
+
+    // Use the getTranslation function to get the translation
+    const translationList = await getTranslations([word], sourceLang, targetLang)
+
+    // Check that the translation was successful and grab the first item in the array if so
+    if (translationList.length === 0) {
+      throw new Error('Translation failed')
+    }
+
+    const translation = translationList[0]
+
+    // Return the translation
+    res.send({ source: word, translation: translation })
+  } catch (err) {
+    res.status(400).send(err)
+  }
+})
 
 /**
  * @route GET /searchSuggestions
