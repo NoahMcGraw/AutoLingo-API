@@ -8,7 +8,7 @@
     "typecheck": "tsc --project ./tsconfig.json --skipLibCheck --noEmit",
     "compile": "npx tsc",
     "serve": "node dist/server.js",
-    "compile:serve": "npm run compile && dist/server.js",
+    "compile:serve": "npm run compile && npm run serve",
     "deploy": "npm run compile && gcloud app deploy"
   },
   "author": "Noah McGraw",
