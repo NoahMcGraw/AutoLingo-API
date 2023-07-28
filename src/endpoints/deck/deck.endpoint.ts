@@ -1,8 +1,8 @@
 import express from 'express'
 import * as deckService from '../../services/deck/deck.service'
-import PropTypeMap from '../../models/PropTypeMap.model'
-import Deck from '../../models/Deck.model'
-import { hasPropertiesWithCorrectTypes } from '../../services/validator/validator.service'
+// import PropTypeMap from '../../models/PropTypeMap.model'
+// import Deck from '../../models/Deck.model'
+// import { hasPropertiesWithCorrectTypes } from '../../services/validator/validator.service'
 const router = express.Router()
 
 router.get('/all', async function (req, res) {
@@ -29,89 +29,89 @@ router.get('/:id', async function (req, res) {
   }
 })
 
-router.patch('/addTopics', async function (req, res) {
-  try {
-    const deck = req.body.deck
-    const topics = req.body.topics
+// router.patch('/addTopics', async function (req, res) {
+//   try {
+//     const deck = req.body.deck
+//     const topics = req.body.topics
 
-    // If deck is not a complete deck object, return an error
-    if (
-      !hasPropertiesWithCorrectTypes<Deck>(deck, <PropTypeMap<Deck>>{
-        id: 'string',
-        name: 'string',
-        sourceLang: 'string',
-        targetLang: 'string',
-        topics: 'object',
-        cards: 'object',
-      })
-    ) {
-      throw new Error('Invalid Deck')
-    }
+//     // If deck is not a complete deck object, return an error
+//     if (
+//       !hasPropertiesWithCorrectTypes<Deck>(deck, <PropTypeMap<Deck>>{
+//         id: 'string',
+//         name: 'string',
+//         sourceLang: 'string',
+//         targetLang: 'string',
+//         topics: 'object',
+//         cards: 'object',
+//       })
+//     ) {
+//       throw new Error('Invalid Deck')
+//     }
 
-    // Add topics to deck
-    await deckService.addTopicsToDeck(deck, topics)
+//     // Add topics to deck
+//     await deckService.addTopicsToDeck(deck, topics)
 
-    res.send(deck)
-  } catch (err) {
-    res.status(400).send(err)
-  }
-})
+//     res.send(deck)
+//   } catch (err) {
+//     res.status(400).send(err)
+//   }
+// })
 
-router.patch('/removeTopic', async function (req, res) {
-  try {
-    const deck = req.body.deck
-    const topic = req.body.topic
+// router.patch('/removeTopic', async function (req, res) {
+//   try {
+//     const deck = req.body.deck
+//     const topic = req.body.topic
 
-    // If deck is not a complete deck object, return an error
-    if (
-      !hasPropertiesWithCorrectTypes<Deck>(deck, <PropTypeMap<Deck>>{
-        id: 'string',
-        name: 'string',
-        sourceLang: 'string',
-        targetLang: 'string',
-        topics: 'object',
-        cards: 'object',
-      })
-    ) {
-      throw new Error('Invalid Deck')
-    }
+//     // If deck is not a complete deck object, return an error
+//     if (
+//       !hasPropertiesWithCorrectTypes<Deck>(deck, <PropTypeMap<Deck>>{
+//         id: 'string',
+//         name: 'string',
+//         sourceLang: 'string',
+//         targetLang: 'string',
+//         topics: 'object',
+//         cards: 'object',
+//       })
+//     ) {
+//       throw new Error('Invalid Deck')
+//     }
 
-    // Add topics to deck
-    await deckService.removeTopicFromDeck(deck, topic)
+//     // Add topics to deck
+//     await deckService.removeTopicFromDeck(deck, topic)
 
-    res.send(deck)
-  } catch (err) {
-    res.status(400).send(err)
-  }
-})
+//     res.send(deck)
+//   } catch (err) {
+//     res.status(400).send(err)
+//   }
+// })
 
-router.patch('/removeCard', async function (req, res) {
-  try {
-    const deck = req.body.deck
-    const cardId = req.body.cardId
+// router.patch('/removeCard', async function (req, res) {
+//   try {
+//     const deck = req.body.deck
+//     const cardId = req.body.cardId
 
-    // If deck is not a complete deck object, return an error
-    if (
-      !hasPropertiesWithCorrectTypes<Deck>(deck, <PropTypeMap<Deck>>{
-        id: 'string',
-        name: 'string',
-        sourceLang: 'string',
-        targetLang: 'string',
-        topics: 'object',
-        cards: 'object',
-      })
-    ) {
-      throw new Error('Invalid Deck')
-    }
+//     // If deck is not a complete deck object, return an error
+//     if (
+//       !hasPropertiesWithCorrectTypes<Deck>(deck, <PropTypeMap<Deck>>{
+//         id: 'string',
+//         name: 'string',
+//         sourceLang: 'string',
+//         targetLang: 'string',
+//         topics: 'object',
+//         cards: 'object',
+//       })
+//     ) {
+//       throw new Error('Invalid Deck')
+//     }
 
-    // Add topics to deck
-    await deckService.removeCardFromDeck(deck, cardId)
+//     // Add topics to deck
+//     await deckService.removeCardFromDeck(deck, cardId)
 
-    res.send(deck)
-  } catch (err) {
-    res.status(400).send(err)
-  }
-})
+//     res.send(deck)
+//   } catch (err) {
+//     res.status(400).send(err)
+//   }
+// })
 
 router.post('/create', async function (req, res) {
   try {

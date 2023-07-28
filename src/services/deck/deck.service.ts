@@ -51,7 +51,7 @@ export const getAllDecks = async (): Promise<Deck[]> => {
  * @returns The deck with the added topic
  * @throws If the deck does not exist
  */
-export const addTopicsToDeck = async (deck: Deck, topics: string[]): Promise<Deck> => {
+const addTopicsToDeck = async (deck: Deck, topics: string[]): Promise<Deck> => {
   let maxCardsPerTopic = 15
 
   let cardsToAdd = [] as Card[]
@@ -127,16 +127,15 @@ export const addTopicsToDeck = async (deck: Deck, topics: string[]): Promise<Dec
 
 /**
  * @param deck The deck to remove a topic from (Will be replaced with ID in future)
- * @param topic The topic to remove from the deck
+ * @param topics The topics to remove from the deck
  * @returns The deck with the removed topic
  * @throws If the deck does not exist
  */
-export const removeTopicFromDeck = async (deck: Deck, topic: string): Promise<Deck> => {
-  deck.topics = deck.topics.filter((t) => t !== topic)
-  deck.cards = deck.cards.filter((c) => c.topic !== topic)
-
-  // Send the editted deck props as payload to the editDeck function
-  await editDeck(deck.id, deck)
+const removeTopicsFromDeck = async (deck: Deck, topics: string[]): Promise<Deck> => {
+  for (const topic of topics) {
+    deck.topics = deck.topics.filter((t) => t !== topic)
+    deck.cards = deck.cards.filter((c) => c.topic !== topic)
+  }
 
   // TODO: Change to return value from editDeck once db is implemented
   return deck
@@ -150,11 +149,8 @@ export const removeTopicFromDeck = async (deck: Deck, topic: string): Promise<De
  * @throws If the card does not exist
  *
  */
-export const removeCardFromDeck = async (deck: Deck, cardId: string): Promise<Deck> => {
+const removeCardFromDeck = async (deck: Deck, cardId: string): Promise<Deck> => {
   deck.cards = deck.cards.filter((c) => c.id !== cardId)
-
-  // Send the editted deck props as payload to the editDeck function
-  await editDeck(deck.id, deck)
 
   // TODO: Change to return value from editDeck once db is implemented
   return deck
@@ -211,9 +207,41 @@ const addDeck = async (deck: Deck): Promise<Deck> => {
  * @throws If the deck does not exist
  * @throws If the payload is invalid
  */
-export const editDeck = async (id: string, payload: Deck): Promise<Deck> => {
-  //TODO: Implement this function
-  return {} as Deck
+export const editDeck = async (
+  id: string,
+  payload: Deck & { topicsToAdd?: string[]; topicsToRemove?: string[]; cardIdToRemove?: string }
+): Promise<Deck> => {
+  // editableDeck is a copy of the deck that we can modify without affecting the original, excluding the topicsToAdd and topicsToRemove properties
+  // TODO: Change this to get a copy of the deck from the db and only require the payload to include props that are being changed
+  let editableDeck = { ...payload }
+  delete editableDeck.topicsToAdd
+  delete editableDeck.topicsToRemove
+
+  let response = {} as Deck
+
+  if (payload.topicsToAdd && payload.topicsToAdd.length > 0) {
+    editableDeck = await addTopicsToDeck(editableDeck, payload.topicsToAdd)
+  }
+
+  if (payload.topicsToRemove && payload.topicsToRemove.length > 0) {
+    editableDeck = await removeTopicsFromDeck(editableDeck, payload.topicsToRemove)
+  }
+
+  if (payload.cardIdToRemove) {
+    editableDeck = await removeCardFromDeck(editableDeck, payload.cardIdToRemove)
+  }
+
+  // Lets do any other edits to the deck here
+  if (payload.name) {
+    editableDeck.name = payload.name
+  }
+
+  //TODO: Implement the db call to edit the deck
+  // doDBSave(editableDeck)
+
+  // Finally, lets return the deck
+  response = editableDeck
+  return response
 }
 
 /**
