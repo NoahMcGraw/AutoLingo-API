@@ -5,25 +5,24 @@ import Deck from '../../models/Deck.model'
 import { hasPropertiesWithCorrectTypes } from '../../services/validator/validator.service'
 const router = express.Router()
 
-router.get('/all', function (req, res) {
+router.get('/all', async function (req, res) {
   try {
-    const decks = deckService.getAllDecks()
+    const decks = await deckService.getAllDecks()
     res.send(decks)
   } catch (err) {
     res.status(400).send(err)
   }
 })
 
-router.get('/:id', function (req, res) {
+router.get('/:id', async function (req, res) {
   try {
     const id = req.params.id
     // If id is not a string, return an error
     if (typeof id !== 'string') {
       throw new Error('Invalid ID')
-      return
     }
 
-    const deck = deckService.getDeck(id)
+    const deck = await deckService.getDeck(id)
     res.send(deck)
   } catch (err) {
     res.status(400).send(err)

@@ -10,8 +10,21 @@ import Card from '../../models/Card.model'
  * @returns The deck with the given ID
  */
 export const getDeck = async (id: string): Promise<Deck> => {
-  // TODO: Implement this function
-  return {} as Deck
+  let deck = {} as Deck
+  // TODO: Implement this as a db call when the db is implemented
+
+  // For now, if the app is running in dev mode, we will return a mock deck from the mock data file under db/mocks
+  if (process.env.NODE_ENV === 'development') {
+    const mockDecks = require('../../db/mocks/decks.test.json')
+    if (mockDecks && mockDecks.length > 0) {
+      const mockDeck = mockDecks.find((deck: Deck) => deck.id === id)
+      if (mockDeck) {
+        deck = mockDeck
+      }
+    }
+  }
+
+  return deck
 }
 
 /**
@@ -19,8 +32,17 @@ export const getDeck = async (id: string): Promise<Deck> => {
  * @throws If the user does not exist
  */
 export const getAllDecks = async (): Promise<Deck[]> => {
-  // TODO: Implement this function
-  return [] as Deck[]
+  let decks = [] as Deck[]
+
+  // TODO: Implement this as a db call when the db is implemented
+
+  // For now, if the app is running in dev mode, we will return a mock deck from the mock data file under db/mocks
+  if (process.env.NODE_ENV === 'development') {
+    const mockDecks = require('../../db/mocks/decks.test.json') as Deck[]
+    decks = mockDecks
+  }
+
+  return decks
 }
 
 /**

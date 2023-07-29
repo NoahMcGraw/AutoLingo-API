@@ -6,8 +6,9 @@
     "outDir": "./dist", // Specify the output directory for generated files
     "strict": true, // Enable all strict type checking options
     "moduleResolution": "node", // Specify module resolution strategy
-    "esModuleInterop": true // Enable emit additional JavaScript to ease support for importing CommonJS modules
+    "esModuleInterop": true, // Enable emit additional JavaScript to ease support for importing CommonJS modules
+    "resolveJsonModule": true // Allow importing .json files
   },
-  "include": ["src/**/*.ts"], // Files to be compiled
+  "include": ["src/**/*.ts", "src/**/*.json"], // Files to be compiled
   "exclude": ["node_modules"] // Files to be ignored
 }
