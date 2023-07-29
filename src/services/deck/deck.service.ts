@@ -15,12 +15,16 @@ export const getDeck = async (id: string): Promise<Deck> => {
 
   // For now, if the app is running in dev mode, we will return a mock deck from the mock data file under db/mocks
   if (process.env.NODE_ENV === 'development') {
-    const mockDecks = require('../../db/mocks/decks.test.json')
-    if (mockDecks && mockDecks.length > 0) {
-      const mockDeck = mockDecks.find((deck: Deck) => deck.id === id)
-      if (mockDeck) {
-        deck = mockDeck
+    try {
+      const mockDecks = require('../../db/mocks/decks.test.json')
+      if (mockDecks && mockDecks.length > 0) {
+        const mockDeck = mockDecks.find((deck: Deck) => deck.id === id)
+        if (mockDeck) {
+          deck = mockDeck
+        }
       }
+    } catch (err) {
+      console.error(err)
     }
   }
 
@@ -38,8 +42,12 @@ export const getAllDecks = async (): Promise<Deck[]> => {
 
   // For now, if the app is running in dev mode, we will return a mock deck from the mock data file under db/mocks
   if (process.env.NODE_ENV === 'development') {
-    const mockDecks = require('../../db/mocks/decks.test.json') as Deck[]
-    decks = mockDecks
+    try {
+      const mockDecks = require('../../db/mocks/decks.test.json') as Deck[]
+      decks = mockDecks
+    } catch (err) {
+      console.error(err)
+    }
   }
 
   return decks
