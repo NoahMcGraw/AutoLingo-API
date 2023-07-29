@@ -8,7 +8,7 @@
     "typecheck": "tsc --project ./tsconfig.json --skipLibCheck --noEmit",
     "compile": "npx tsc",
     "serve": "node dist/server.js",
-    "compile:serve": "npm run compile && npm run serve",
+    "dev": "npm run compile && cross-env NODE_ENV=development node dist/server.js",
     "deploy": "npm run compile && gcloud app deploy"
   },
   "author": "Noah McGraw",
@@ -30,6 +30,7 @@
     "@types/jest": "^29.5.3",
     "@types/node": "^20.3.3",
     "@types/uuid": "^9.0.2",
+    "cross-env": "^7.0.3",
     "eslint": "^8.44.0",
     "husky": "^8.0.3",
     "jest": "^29.6.1",
