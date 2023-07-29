@@ -74,6 +74,8 @@ const addTopicsToDeck = async (deck: Deck, topics: string[]): Promise<Deck> => {
           id: uuidv4(),
           topic: topic,
           sourceWord: source,
+          sourceLang: deck.sourceLang,
+          targetLang: deck.targetLang,
         } as Card)
       }
     } catch (err) {
