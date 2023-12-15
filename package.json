@@ -8,7 +8,7 @@
     "typecheck": "tsc --project ./tsconfig.json --skipLibCheck --noEmit",
     "compile": "npx tsc",
     "serve": "node dist/server.js",
-    "dev": "npm run compile && cross-env NODE_ENV=development node dist/server.js",
+    "dev": "npm run compile && cross-env NODE_ENV=development PORT=3003 node dist/server.js",
     "deploy": "npm run compile && gcloud app deploy"
   },
   "author": "Noah McGraw",
